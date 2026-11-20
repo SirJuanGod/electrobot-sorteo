@@ -4,9 +4,21 @@ Web pública (React + Vite) con los enfrentamientos de **Sumo Colegios** y **Min
 
 ## Flujo del día
 
-1. **Checklist (OneDrive).** Sube `Checklist_Electrobot.xlsx` a OneDrive. Un equipo por fila; si está en varias categorías aparece una sola vez con varias ✔. Filtra por categoría con el filtro de la columna (`Sumo Colegios`, `Minisumo PRO`, `Robot Laberinto`) y marca `Presente` / `Robot revisado` con la lista Sí/No.
-2. **Sortear.** En la web abre `#organizador` (enlace "Organizador" en el pie). Descarga el checklist de OneDrive y cárgalo; con "Solo Presente = Sí" sortea solo a los que llegaron. Pulsa **Sortear** y revisa la vista previa.
-3. **Publicar.** Pulsa **Descargar sorteo.json** y súbelo al repo en `web/public/sorteo.json` (GitHub › Add file › Upload files › Commit). GitHub Actions vuelve a publicar en 1–2 min.
+1. **Entrar como organizador.** En la web abre `#organizador` (enlace "Organizador" en el pie) e ingresa la contraseña.
+2. **Checklist en la web.** Carga el Excel de inscripciones (el export de Forms, aunque lo hayas editado) o un checklist exportado antes. Marca *Presente*, *Revisado* y *Observaciones*. Las marcas se guardan en ese navegador; si cargas una versión nueva del Excel se conservan. Usa **Exportar checklist (.xlsx)** para tener copia.
+3. **Sortear.** Con "Sortear solo equipos presentes" pulsa **Sortear** y revisa la vista previa.
+4. **Publicar.** Pulsa **Descargar sorteo.json** y súbelo al repo en `web/public/sorteo.json` (GitHub › Add file › Upload files › Commit). GitHub Actions vuelve a publicar en 1–2 min.
+
+> El Excel **no se sube al repositorio**: es público y el export trae cédulas, celulares y correos. La web lo lee solo en tu navegador.
+
+### Cambiar la contraseña del organizador
+
+```bash
+cd web
+npm run clave -- "NuevaClave"
+```
+
+Copia el hash que imprime en `ORG_HASH` de `web/src/App.jsx` y haz commit. La clave se verifica en el navegador (el sitio es estático): impide el acceso casual, no es seguridad fuerte. Por eso los datos personales nunca se publican.
 
 ## Regenerar el checklist desde un nuevo export de Forms
 

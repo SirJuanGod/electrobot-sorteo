@@ -30,18 +30,12 @@ export function drawAll(categorias, rand) {
   return { publicado: true, fecha: new Date().toISOString(), categorias: out }
 }
 
-const norm = (s) => String(s ?? '').trim().toLowerCase()
-
-// Lee las filas de la hoja "Checklist" (sheet_to_json) y arma los equipos por categoría.
-export function teamsFromChecklist(rows, onlyPresent) {
-  const categorias = Object.fromEntries(CATS.map((c) => [c, { equipos: [] }]))
-  for (const r of rows) {
-    const equipo = String(r['Equipo'] ?? '').trim()
-    if (!equipo) continue
-    if (onlyPresent && !['sí', 'si'].includes(norm(r['Presente']))) continue
-    for (const c of CATS) {
-      if (String(r[c] ?? '').trim()) categorias[c].equipos.push({ equipo, institucion: String(r['Institución'] ?? '').trim() })
-    }
-  }
-  return categorias
+// Arma los equipos por categoría desde el checklist (parseRows), opcionalmente solo los presentes.
+export function teamsFromChecklist(teams, onlyPresent) {
+  return Object.fromEntries(
+    CATS.map((c) => [
+      c,
+      { equipos: teams.filter((t) => t.cats.includes(c) && (!onlyPresent || t.presente)).map((t) => ({ equipo: t.equipo, institucion: t.institucion })) },
+    ]),
+  )
 }

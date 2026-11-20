@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { CATS, isCombat, drawAll, teamsFromChecklist } from './draw.js'
+import { parseRows, mergeStatus, toSheetRows, sha256, key as key2 } from './checklist.js'
 
 const TABS = [
   { id: 'sumo', label: 'Sumo Colegios', cat: 'Sumo Colegios' },
@@ -58,7 +59,7 @@ export default function App() {
       <main>
         {error && <p className="notice">{error}</p>}
         {!data && !error && <p className="notice mono">Cargando…</p>}
-        {data && tab === 'organizador' && <Organizer data={data} />}
+        {data && tab === 'organizador' && <Locked><Organizer data={data} /></Locked>}
         {data && tab === 'equipos' && <Teams data={data} />}
         {data && current?.cat && <Category cat={current.cat} info={data.categorias[current.cat]} fecha={data.fecha} />}
       </main>
@@ -183,31 +184,86 @@ function Teams({ data }) {
   )
 }
 
+// shortcut: la clave se comprueba en el navegador (sitio estático); solo impide el acceso casual.
+// Sirve porque los datos personales nunca se suben: el archivo se lee localmente. Cambiar con: npm run clave -- "nueva"
+const ORG_HASH = '6d540fd11bb3b23dd3e094a1e4b1c50a364738ab0f5f3f315051fa89ba6de1ff'
+const STORE = 'electrobot-checklist'
+const safe = (fn, fallback) => {
+  try {
+    return fn()
+  } catch {
+    return fallback
+  }
+}
+
+function Locked({ children }) {
+  const [ok, setOk] = useState(() => safe(() => sessionStorage.getItem('org') === ORG_HASH, false))
+  const [err, setErr] = useState('')
+  if (ok) return children
+  async function submit(e) {
+    e.preventDefault()
+    const h = await sha256(new FormData(e.target).get('clave'))
+    if (h !== ORG_HASH) return setErr('Contraseña incorrecta.')
+    safe(() => sessionStorage.setItem('org', h))
+    setOk(true)
+  }
+  return (
+    <section>
+      <div className="section-head">
+        <div>
+          <p className="mono label">Acceso restringido</p>
+          <h2>Modo organizador</h2>
+        </div>
+      </div>
+      <form className="filters" onSubmit={submit}>
+        <label>
+          Contraseña
+          <input name="clave" type="password" autoComplete="current-password" required autoFocus />
+        </label>
+        <button className="btn">Entrar</button>
+      </form>
+      {err && <p className="notice error" role="alert">{err}</p>}
+    </section>
+  )
+}
+
 function Organizer({ data }) {
-  const [source, setSource] = useState(null) // { name, rows }
+  const [list, setList] = useState(() => safe(() => JSON.parse(localStorage.getItem(STORE)), null)) // { name, teams }
   const [onlyPresent, setOnlyPresent] = useState(true)
+  const [cat, setCat] = useState('Todas')
+  const [q, setQ] = useState('')
   const [result, setResult] = useState(null)
   const [msg, setMsg] = useState('')
 
+  // Guarda cada marca en este navegador para no perderla si se recarga la página.
+  useEffect(() => safe(() => (list ? localStorage.setItem(STORE, JSON.stringify(list)) : localStorage.removeItem(STORE))), [list])
+
   async function onFile(e) {
     const file = e.target.files[0]
+    e.target.value = ''
     if (!file) return
     try {
       const XLSX = await import('xlsx') // solo el organizador lo necesita
       const wb = XLSX.read(await file.arrayBuffer())
       const ws = wb.Sheets['Checklist'] ?? wb.Sheets[wb.SheetNames[0]]
-      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' })
-      if (!rows.length || !('Equipo' in rows[0])) throw new Error('El archivo no tiene la columna "Equipo".')
-      setSource({ name: file.name, rows })
+      const teams = parseRows(XLSX.utils.sheet_to_json(ws, { defval: '' }))
+      if (!teams.length) throw new Error('No hay equipos en el archivo.')
+      setList({ name: file.name, teams: mergeStatus(teams, list?.teams) })
       setResult(null)
       setMsg('')
     } catch (err) {
-      setMsg(`No se pudo leer el checklist: ${err.message}`)
+      setMsg(`No se pudo leer el archivo: ${err.message}`)
     }
   }
 
-  const categorias = source ? teamsFromChecklist(source.rows, onlyPresent) : data.categorias
-  const total = CATS.map((c) => `${c}: ${categorias[c].equipos.length}`).join(' · ')
+  const set = (k, field, value) => setList((l) => ({ ...l, teams: l.teams.map((t) => (t.k === k ? { ...t, [field]: value } : t)) }))
+
+  async function exportXlsx() {
+    const XLSX = await import('xlsx')
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(toSheetRows(list.teams)), 'Checklist')
+    XLSX.writeFile(wb, 'Checklist_Electrobot.xlsx')
+  }
 
   function download() {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' })
@@ -216,31 +272,103 @@ function Organizer({ data }) {
     URL.revokeObjectURL(a.href)
   }
 
+  function reset() {
+    if (confirm('¿Borrar el checklist de este navegador? Las marcas de Presente y Revisado se pierden si no exportaste el Excel.')) setList(null)
+  }
+
+  const teams = list?.teams ?? []
+  const categorias = list ? teamsFromChecklist(teams, onlyPresent) : data.categorias
+  const total = CATS.map((c) => `${c}: ${categorias[c].equipos.length}`).join(' · ')
+  const shown = teams.filter(
+    (t) => (cat === 'Todas' || t.cats.includes(cat)) && key2(`${t.equipo} ${t.institucion} ${t.integrantes.join(' ')}`).includes(key2(q)),
+  )
+  const inCat = cat === 'Todas' ? teams : teams.filter((t) => t.cats.includes(cat))
+
   return (
     <section>
       <div className="section-head">
         <div>
           <p className="mono label">Panel del organizador</p>
-          <h2>Sorteo</h2>
+          <h2>Checklist y sorteo</h2>
         </div>
       </div>
       <ol className="steps">
         <li>
-          Descarga el checklist desde OneDrive (<em>Archivo › Crear una copia › Descargar</em>) con la columna <b>Presente</b> actualizada.
+          Carga el Excel de inscripciones (export de Forms) o un checklist exportado antes. Se lee solo en este navegador: no se sube a ningún servidor.
           <label className="file">
             <input type="file" accept=".xlsx,.xls" onChange={onFile} />
-            {source ? `✔ ${source.name}` : 'Cargar checklist (.xlsx)'}
+            {list ? `✔ ${list.name} · cargar otra versión` : 'Cargar Excel (.xlsx)'}
           </label>
-          {!source && <p className="small">Sin archivo se usan todos los equipos inscritos publicados.</p>}
-          {source && (
+          {list && <p className="small">Si cargas una versión modificada, se conservan las marcas que ya hiciste.</p>}
+          {msg && <p className="notice error" role="alert">{msg}</p>}
+        </li>
+        {list && (
+          <li>
+            Marca la llegada y la revisión de cada robot. Se guarda solo en este navegador.
+            <div className="chips">
+              <span className="chip">{inCat.length} equipos</span>
+              <span className="chip ok">{inCat.filter((t) => t.presente).length} presentes</span>
+              <span className="chip ok">{inCat.filter((t) => t.revisado).length} revisados</span>
+            </div>
+            <div className="filters">
+              <label>
+                Categoría
+                <select value={cat} onChange={(e) => setCat(e.target.value)}>
+                  {['Todas', ...CATS].map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </label>
+              <label>
+                Buscar
+                <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Equipo, institución o integrante" />
+              </label>
+            </div>
+            <div className="table-wrap">
+              <table className="checklist">
+                <thead>
+                  <tr>
+                    <th>Equipo</th>
+                    <th>Presente</th>
+                    <th>Revisado</th>
+                    <th>Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shown.map((t) => (
+                    <tr key={t.k} className={t.presente ? 'here' : ''}>
+                      <td>
+                        <Side t={t} />
+                        <div className="tags">{t.cats.map((c) => <span key={c} className="tag">{c}</span>)}</div>
+                        {t.integrantes.length > 0 && <p className="small members">{t.integrantes.join(' · ')}</p>}
+                      </td>
+                      <td>
+                        <input type="checkbox" checked={t.presente} onChange={(e) => set(t.k, 'presente', e.target.checked)} aria-label={`${t.equipo} presente`} />
+                      </td>
+                      <td>
+                        <input type="checkbox" checked={t.revisado} onChange={(e) => set(t.k, 'revisado', e.target.checked)} aria-label={`${t.equipo} robot revisado`} />
+                      </td>
+                      <td>
+                        <input type="text" value={t.obs} onChange={(e) => set(t.k, 'obs', e.target.value)} aria-label={`Observaciones de ${t.equipo}`} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!shown.length && <p className="notice">Ningún equipo coincide con la búsqueda.</p>}
+            </div>
+            <div className="chips">
+              <button className="btn" onClick={exportXlsx}>Exportar checklist (.xlsx)</button>
+              <button className="btn ghost" onClick={reset}>Borrar checklist</button>
+            </div>
+          </li>
+        )}
+        <li>
+          {!list && <p className="small">Sin archivo se usan todos los equipos inscritos publicados.</p>}
+          {list && (
             <label className="check">
-              <input type="checkbox" checked={onlyPresent} onChange={(e) => setOnlyPresent(e.target.checked)} /> Solo equipos con Presente = Sí
+              <input type="checkbox" checked={onlyPresent} onChange={(e) => setOnlyPresent(e.target.checked)} /> Sortear solo equipos presentes
             </label>
           )}
           <p className="mono small">{total}</p>
-          {msg && <p className="notice error">{msg}</p>}
-        </li>
-        <li>
           <button className="btn" onClick={() => setResult(drawAll(categorias))}>{result ? 'Volver a sortear' : 'Sortear'}</button>
         </li>
         <li>

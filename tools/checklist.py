@@ -39,9 +39,9 @@ def clean(s):
     return s
 
 
-def category(raw):
-    k = key(raw)
-    return next(c for c in CATS if key(c) in k)
+def categories(raw):
+    k = key(raw)  # Forms une varias categorías marcadas en una misma respuesta con ";"
+    return {c for c in CATS if key(c) in k}
 
 
 def institution(raw):
@@ -60,7 +60,7 @@ def load(path):
         if not name:
             continue
         t = teams.setdefault(key(name), {"equipo": name, "institucion": institution(r[col["Institución educativa al cual representa:"]]), "cats": set(), "integrantes": []})
-        t["cats"].add(category(r[col["Categoría a Participar:"]]))
+        t["cats"].update(categories(r[col["Categoría a Participar:"]]))
         for c in name_cols:
             m = clean(r[c])
             if len(m) > 1 and key(m) not in map(key, t["integrantes"]):
