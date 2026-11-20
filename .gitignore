@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# Datos personales de inscripción: no subir a un repositorio público
+*.xlsx
