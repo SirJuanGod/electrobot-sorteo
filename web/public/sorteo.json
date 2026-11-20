@@ -5,12 +5,16 @@
     "Sumo Colegios": {
       "equipos": [
         {
-          "equipo": "Akirot",
-          "institucion": "IETI Rafael Navia Varón"
+          "equipo": "HAKUO",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
         {
-          "equipo": "Berserk",
-          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
+          "equipo": "NARUTO",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+        },
+        {
+          "equipo": "R2-D2",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
         {
           "equipo": "BEYMAX",
@@ -25,8 +29,28 @@
           "institucion": "Colegio Comfandi El Prado"
         },
         {
-          "equipo": "HAKUO",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+          "equipo": "Akirot",
+          "institucion": "IETI Rafael Navia Varón"
+        },
+        {
+          "equipo": "Sae y Shidou",
+          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
+        },
+        {
+          "equipo": "Berserk",
+          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
+        },
+        {
+          "equipo": "Mega Brick",
+          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
+        },
+        {
+          "equipo": "Nova",
+          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
+        },
+        {
+          "equipo": "Titan Pinkit",
+          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
         },
         {
           "equipo": "Hijos de Tesla 1",
@@ -41,32 +65,8 @@
           "institucion": "Colegio Comfandi El Prado"
         },
         {
-          "equipo": "Mega Brick",
-          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
-        },
-        {
-          "equipo": "NARUTO",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
-        },
-        {
-          "equipo": "Nova",
-          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
-        },
-        {
-          "equipo": "R2-D2",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
-        },
-        {
-          "equipo": "Sae y Shidou",
-          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
-        },
-        {
           "equipo": "TerrenatorB.2",
           "institucion": "IETI Rafael Navia Varón"
-        },
-        {
-          "equipo": "Titan Pinkit",
-          "institucion": "IE Luis Fernando Caicedo & DaTIC - LID Comuna 1"
         }
       ],
       "sorteo": null
@@ -74,23 +74,11 @@
     "Minisumo PRO": {
       "equipos": [
         {
+          "equipo": "Sukuna",
+          "institucion": "Universidad Autónoma de Occidente"
+        },
+        {
           "equipo": "ACES",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "Ataraxia",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "Bitmind",
-          "institucion": "Universidad San Buenaventura"
-        },
-        {
-          "equipo": "Gecko Buddy",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "GoldenBoyz",
           "institucion": "Universidad Autónoma de Occidente"
         },
         {
@@ -98,20 +86,40 @@
           "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
         {
-          "equipo": "Kineta-01",
-          "institucion": "Universidad Santiago de Cali"
+          "equipo": "NARUTO",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+        },
+        {
+          "equipo": "Gecko Buddy",
+          "institucion": "Universidad Autónoma de Occidente"
         },
         {
           "equipo": "Kusanagi",
           "institucion": "Universidad Santiago de Cali"
         },
         {
-          "equipo": "Lego HASS",
-          "institucion": "Colegio Comfandi El Prado"
+          "equipo": "Rocket",
+          "institucion": "Universidad Autónoma de Occidente"
         },
         {
-          "equipo": "LOS HIJOS DE TESLA 10",
-          "institucion": "Los Andes"
+          "equipo": "THE PEKE",
+          "institucion": "Universidad Autónoma de Occidente"
+        },
+        {
+          "equipo": "Picolo",
+          "institucion": "Universidad Autónoma de Occidente"
+        },
+        {
+          "equipo": "Ataraxia",
+          "institucion": "Universidad Autónoma de Occidente"
+        },
+        {
+          "equipo": "Samael",
+          "institucion": "Universidad del Cauca"
+        },
+        {
+          "equipo": "GoldenBoyz",
+          "institucion": "Universidad Autónoma de Occidente"
         },
         {
           "equipo": "Los hijos de Tesla 2",
@@ -146,32 +154,24 @@
           "institucion": "Los Andes"
         },
         {
-          "equipo": "NARUTO",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+          "equipo": "LOS HIJOS DE TESLA 10",
+          "institucion": "Los Andes"
         },
         {
-          "equipo": "Picolo",
-          "institucion": "Universidad Autónoma de Occidente"
+          "equipo": "Kineta-01",
+          "institucion": "Universidad Santiago de Cali"
+        },
+        {
+          "equipo": "Bitmind",
+          "institucion": "Universidad San Buenaventura"
+        },
+        {
+          "equipo": "Lego HASS",
+          "institucion": "Colegio Comfandi El Prado"
         },
         {
           "equipo": "Piruvato",
           "institucion": "Universidad Santiago de Cali"
-        },
-        {
-          "equipo": "Rocket",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "Samael",
-          "institucion": "Universidad del Cauca"
-        },
-        {
-          "equipo": "Sukuna",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "THE PEKE",
-          "institucion": "Universidad Autónoma de Occidente"
         }
       ],
       "sorteo": null
@@ -183,6 +183,10 @@
           "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
         {
+          "equipo": "STUART",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+        },
+        {
           "equipo": "Dark Vader",
           "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
@@ -191,8 +195,20 @@
           "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         },
         {
+          "equipo": "WALL-E",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+        },
+        {
+          "equipo": "SPARK",
+          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
+        },
+        {
           "equipo": "GrantXplorer",
           "institucion": "Universidad del Quindío"
+        },
+        {
+          "equipo": "Nanos",
+          "institucion": "Universidad Autónoma de Occidente"
         },
         {
           "equipo": "IETIPAM",
@@ -201,22 +217,6 @@
         {
           "equipo": "Lego HASS",
           "institucion": "Colegio Comfandi El Prado"
-        },
-        {
-          "equipo": "Nanos",
-          "institucion": "Universidad Autónoma de Occidente"
-        },
-        {
-          "equipo": "SPARK",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
-        },
-        {
-          "equipo": "STUART",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
-        },
-        {
-          "equipo": "WALL-E",
-          "institucion": "IE Técnico Industrial Pedro Antonio Molina"
         }
       ],
       "sorteo": null

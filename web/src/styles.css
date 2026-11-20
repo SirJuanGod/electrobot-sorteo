@@ -164,3 +164,14 @@ footer a { color: #c9d6ff; }
 .cats .tag { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
 .cats .tag.off { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
 .cats input { width: 0.9rem; height: 0.9rem; margin: 0; }
+.round + .round { margin-top: 24px; }
+.round h3 { margin: 0 0 8px; }
+.match.done { border-top-color: var(--ok); }
+.won { color: var(--ok); font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.pick { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.pick:hover { border-color: var(--blue); }
+.pick:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.pick.win { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.champion { margin: 0 0 20px; padding: 14px 18px; border-radius: 12px; background: var(--orange); color: #1a0d00; font-size: 1.1rem; }
+.champion span { display: block; font-size: 0.85rem; }
+.results > section + section { margin-top: 32px; }

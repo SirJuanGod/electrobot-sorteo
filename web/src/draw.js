@@ -39,3 +39,25 @@ export function teamsFromChecklist(teams, onlyPresent) {
     ]),
   )
 }
+
+// Eliminación directa a partir de la ronda 1 ([a, b|null]) y los ganadores { 'ronda-combate': nombre del equipo }.
+// En cada combate: a/b = equipo, null = BYE, undefined = por definir; w = ganador.
+// Se guarda el nombre (no "a"/"b"): si cambia un resultado anterior, los posteriores que ya no aplican se ignoran solos.
+export function bracket(first = [], ganadores = {}) {
+  if (!first.length) return []
+  const rounds = []
+  let cur = first.map(([a, b]) => ({ a, b: b ?? null }))
+  for (let r = 0; ; r++) {
+    cur.forEach((m, i) => {
+      const g = ganadores[`${r}-${i}`]
+      m.w = m.a && m.b === null ? m.a : [m.a, m.b].find((t) => t && t.equipo === g)
+    })
+    rounds.push(cur)
+    if (cur.length === 1) return rounds
+    const next = []
+    for (let i = 0; i < cur.length; i += 2) next.push({ a: cur[i].w, b: i + 1 < cur.length ? cur[i + 1].w : null })
+    cur = next
+  }
+}
+
+export const roundName = (r, total) => (r === total - 1 ? 'Final' : r === total - 2 ? 'Semifinal' : `Ronda ${r + 1}`)
