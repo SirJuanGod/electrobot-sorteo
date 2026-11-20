@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { CATS, isCombat, drawAll, teamsFromChecklist, bracket, roundName } from './draw.js'
+import { CATS, isCombat, drawAll, teamsFromChecklist, bracket, roundName, parseTime, fmtTime, ranking } from './draw.js'
 import * as fb from './firebase.js'
 import { parseRows, mergeStatus, toSheetRows, sha256, key as key2 } from './checklist.js'
 
@@ -94,18 +94,18 @@ const merge = (base, live) =>
     : {
         fecha: live.fecha,
         categorias: Object.fromEntries(
-          CATS.map((c) => [c, { equipos: base.categorias[c]?.equipos ?? [], sorteo: live.categorias?.[c]?.sorteo ?? null, ganadores: live.categorias?.[c]?.ganadores ?? {} }]),
+          CATS.map((c) => [c, { equipos: base.categorias[c]?.equipos ?? [], sorteo: live.categorias?.[c]?.sorteo ?? null, ganadores: live.categorias?.[c]?.ganadores ?? {}, tiempos: live.categorias?.[c]?.tiempos ?? {} }]),
         ),
       }
 
-function Category({ cat, info, fecha, onPick }) {
+function Category({ cat, info, fecha, onPick, onTime }) {
   const teams = info?.equipos ?? []
   const sorteo = info?.sorteo
   return (
     <section>
       <div className="section-head">
         <div>
-          <p className="mono label">{isCombat(cat) ? 'Enfrentamientos' : 'Orden de salida'}</p>
+          <p className="mono label">{isCombat(cat) ? 'Enfrentamientos' : 'Orden de salida y tiempos'}</p>
           <h2>{cat}</h2>
         </div>
         <div className="chips">
@@ -126,16 +126,7 @@ function Category({ cat, info, fecha, onPick }) {
 
       {sorteo && isCombat(cat) && <Bracket info={info} onPick={onPick} />}
 
-      {sorteo && !isCombat(cat) && (
-        <ol className="order">
-          {sorteo.map((t, i) => (
-            <li key={t.equipo}>
-              <span className="turn mono">{String(i + 1).padStart(2, '0')}</span>
-              <Side t={t} />
-            </li>
-          ))}
-        </ol>
-      )}
+      {sorteo && !isCombat(cat) && <Maze info={info} onTime={onTime} />}
     </section>
   )
 }
@@ -178,6 +169,74 @@ function Bracket({ info, onPick }) {
         </div>
       ))}
     </>
+  )
+}
+
+function Maze({ info, onTime }) {
+  const tiempos = info.tiempos ?? {}
+  const { rows, winner } = ranking(info.sorteo, tiempos)
+  return (
+    <>
+      {winner && (
+        <p className="champion">
+          🏆 Ganador: <strong>{winner.equipo}</strong> <span>{winner.institucion} · {fmtTime(tiempos[info.sorteo.indexOf(winner)])}</span>
+        </p>
+      )}
+      {rows.length > 0 && (
+        <div className="round">
+          <h3 className="mono label">Clasificación</h3>
+          <ol className="order">
+            {rows.map(({ t, time }, n) => (
+              <li key={t.equipo} className={time === 'NT' ? 'nt' : ''}>
+                <span className="turn mono">{time === 'NT' ? '–' : n + 1}</span>
+                <Side t={t} />
+                <span className="time mono">{fmtTime(time)}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+      <div className="round">
+        <h3 className="mono label">Orden de salida</h3>
+        {onTime && <p className="small">Escribe el tiempo (1:23.45 o 83.45) o NT si no terminó, y pulsa Enter. Bórralo para quitarlo.</p>}
+        <ol className="order">
+          {info.sorteo.map((t, i) => (
+            <li key={t.equipo}>
+              <span className="turn mono">{String(i + 1).padStart(2, '0')}</span>
+              <Side t={t} />
+              {onTime ? <TimeInput t={t} value={tiempos[i]} onSave={(v) => onTime(i, v)} /> : <span className="time mono">{fmtTime(tiempos[i])}</span>}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </>
+  )
+}
+
+function TimeInput({ t, value, onSave }) {
+  const [bad, setBad] = useState(false)
+  function commit(e) {
+    const v = parseTime(e.target.value)
+    setBad(Number.isNaN(v))
+    if (Number.isNaN(v)) return
+    if (v !== (value ?? null)) onSave(v)
+    e.target.value = fmtTime(v)
+  }
+  return (
+    <span className="time-input">
+      <input
+        key={String(value)} // se actualiza si otro organizador cambia el tiempo
+        type="text"
+        inputMode="decimal"
+        defaultValue={fmtTime(value)}
+        placeholder="0:00.00"
+        aria-label={`Tiempo de ${t.equipo}`}
+        aria-invalid={bad}
+        onBlur={commit}
+        onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+      />
+      {bad && <span className="err" role="alert">Formato: 1:23.45, 83.45 o NT</span>}
+    </span>
   )
 }
 
@@ -367,6 +426,9 @@ function Organizer({ data, live }) {
     }
   }
 
+  const saveTime = (i, v) =>
+    fb.save(`categorias/Robot Laberinto/tiempos/${i}`, v).catch(() => setMsg('No se pudo guardar el tiempo. Revisa la conexión.'))
+
   const pick = (cat) => (r, i, equipo) =>
     fb.save(`categorias/${cat}/ganadores/${r}-${i}`, equipo).catch(() => setMsg('No se pudo guardar el ganador. Revisa la conexión.'))
 
@@ -494,12 +556,14 @@ function Organizer({ data, live }) {
           )}
         </li>
         <li>
-          Marca los ganadores. La siguiente ronda se arma sola.
+          Marca los ganadores de los combates (la siguiente ronda se arma sola) y los tiempos de Laberinto.
           {!fb.enabled && <p className="notice">Para registrar ganadores en vivo, configura Firebase (ver README).</p>}
           {fb.enabled && !live && <p className="small">Aún no hay sorteo publicado.</p>}
           {fb.enabled && live && (
             <div className="results">
-              {CATS.filter(isCombat).map((c) => <Category key={c} cat={c} info={data.categorias[c]} fecha={data.fecha} onPick={pick(c)} />)}
+              {CATS.map((c) => (
+                <Category key={c} cat={c} info={data.categorias[c]} fecha={data.fecha} onPick={isCombat(c) ? pick(c) : undefined} onTime={isCombat(c) ? undefined : saveTime} />
+              ))}
             </div>
           )}
           {fb.enabled && <button className="btn ghost" onClick={() => fb.logout()}>Cerrar sesión</button>}

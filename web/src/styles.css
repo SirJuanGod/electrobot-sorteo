@@ -175,3 +175,9 @@ footer a { color: #c9d6ff; }
 .champion { margin: 0 0 20px; padding: 14px 18px; border-radius: 12px; background: var(--orange); color: #1a0d00; font-size: 1.1rem; }
 .champion span { display: block; font-size: 0.85rem; }
 .results > section + section { margin-top: 32px; }
+.order .time { margin-left: auto; font-weight: 700; font-size: 1.05rem; color: var(--blue); white-space: nowrap; }
+.order li.nt .time { color: var(--muted); }
+.time-input { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.time-input input { width: 7.5rem; text-align: right; font-family: 'JetBrains Mono', monospace; }
+.time-input input[aria-invalid='true'] { border-color: #d63a3a; }
+.time-input .err { font-size: 0.7rem; color: #d63a3a; }

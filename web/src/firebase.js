@@ -1,7 +1,7 @@
 // Pega aquí la configuración de tu app web de Firebase (Consola › Configuración del proyecto › Tus apps).
 // No es secreta: lo que protege los datos son las reglas de la base de datos (ver README).
 // Con null, la web funciona sin resultados en vivo (sorteo.json + contraseña local).
-const CONFIG = {
+const CONFIG = import.meta.env.VITE_FB_EMULATOR ? null : {
   apiKey: 'AIzaSyAYDg-L6yJuFbs4h_IMZSSOvMk8A1KsHUk',
   authDomain: 'electrobot-usc.firebaseapp.com',
   databaseURL: 'https://electrobot-usc-default-rtdb.firebaseio.com',

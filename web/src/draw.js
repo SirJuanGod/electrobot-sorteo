@@ -61,3 +61,24 @@ export function bracket(first = [], ganadores = {}) {
 }
 
 export const roundName = (r, total) => (r === total - 1 ? 'Final' : r === total - 2 ? 'Semifinal' : `Ronda ${r + 1}`)
+
+// Laberinto: "1:23.45", "83.45" o "83,45" → segundos; "NT" = no terminó; vacío → null; inválido → NaN.
+export function parseTime(s) {
+  const v = String(s ?? '').trim().replace(',', '.').toUpperCase()
+  if (!v) return null
+  if (v === 'NT') return 'NT'
+  const m = v.match(/^(?:(\d+):)?(\d+(?:\.\d+)?)$/)
+  if (!m || (m[1] && Number(m[2]) >= 60)) return NaN
+  return Math.round(((Number(m[1] ?? 0) * 60) + Number(m[2])) * 100) / 100
+}
+
+export const fmtTime = (t) =>
+  t === 'NT' ? 'NT' : typeof t !== 'number' ? '' : `${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`
+
+// Clasificación por tiempo (más rápido primero; NT al final; sin tiempo, fuera). Ganador cuando todos tienen resultado.
+export function ranking(order = [], tiempos = {}) {
+  const rows = order.map((t, i) => ({ t, time: tiempos[i] })).filter((r) => r.time != null)
+  rows.sort((a, b) => (a.time === 'NT') - (b.time === 'NT') || (a.time === 'NT' ? 0 : a.time - b.time))
+  const done = order.length > 0 && rows.length === order.length
+  return { rows, winner: done && rows[0]?.time !== 'NT' ? rows[0].t : null }
+}
