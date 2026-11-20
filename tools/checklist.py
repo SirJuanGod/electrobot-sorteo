@@ -53,7 +53,7 @@ def load(path):
     ws = openpyxl.load_workbook(path).active
     head = [clean(h) for h in next(ws.iter_rows(max_row=1, values_only=True))]
     col = {h: i for i, h in enumerate(head)}
-    name_cols = [col[f"Nombres y Apellidos - Integrante {n}"] for n in (1, 2, 3)]
+    name_cols = [col[h] for n in (1, 2, 3) if (h := f"Nombres y Apellidos - Integrante {n}") in col]  # el Excel del repo no trae integrantes
     teams = {}
     for r in ws.iter_rows(min_row=2, values_only=True):
         name = clean(r[col["Nombre del Equipo o Robot:"]])

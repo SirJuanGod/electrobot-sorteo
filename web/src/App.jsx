@@ -238,17 +238,14 @@ function Organizer({ data }) {
   // Guarda cada marca en este navegador para no perderla si se recarga la página.
   useEffect(() => safe(() => (list ? localStorage.setItem(STORE, JSON.stringify(list)) : localStorage.removeItem(STORE))), [list])
 
-  async function onFile(e) {
-    const file = e.target.files[0]
-    e.target.value = ''
-    if (!file) return
+  async function load(buffer, name) {
     try {
       const XLSX = await import('xlsx') // solo el organizador lo necesita
-      const wb = XLSX.read(await file.arrayBuffer())
+      const wb = XLSX.read(buffer)
       const ws = wb.Sheets['Checklist'] ?? wb.Sheets[wb.SheetNames[0]]
       const teams = parseRows(XLSX.utils.sheet_to_json(ws, { defval: '' }))
       if (!teams.length) throw new Error('No hay equipos en el archivo.')
-      setList({ name: file.name, teams: mergeStatus(teams, list?.teams) })
+      setList({ name, teams: mergeStatus(teams, list?.teams) })
       setResult(null)
       setMsg('')
     } catch (err) {
@@ -256,7 +253,23 @@ function Organizer({ data }) {
     }
   }
 
-  const set = (k, field, value) => setList((l) => ({ ...l, teams: l.teams.map((t) => (t.k === k ? { ...t, [field]: value } : t)) }))
+  async function onFile(e) {
+    const file = e.target.files[0]
+    e.target.value = ''
+    if (file) load(await file.arrayBuffer(), file.name)
+  }
+
+  async function fromRepo() {
+    const r = await fetch(`./inscripciones.xlsx?t=${Date.now()}`).catch(() => null)
+    if (!r?.ok) return setMsg('No se pudo descargar inscripciones.xlsx del repositorio.')
+    load(await r.arrayBuffer(), 'inscripciones.xlsx (repositorio)')
+  }
+
+  const update = (k, fn) => setList((l) => ({ ...l, teams: l.teams.map((t) => (t.k === k ? fn(t) : t)) }))
+  const set = (k, field, value) => update(k, (t) => ({ ...t, [field]: value }))
+  // Para equipos que se inscribieron en la categoría equivocada.
+  const toggleCat = (k, c) =>
+    update(k, (t) => ({ ...t, catsEditadas: true, cats: CATS.filter((x) => (x === c ? !t.cats.includes(c) : t.cats.includes(x))) }))
 
   async function exportXlsx() {
     const XLSX = await import('xlsx')
@@ -294,11 +307,15 @@ function Organizer({ data }) {
       </div>
       <ol className="steps">
         <li>
-          Carga el Excel de inscripciones (export de Forms) o un checklist exportado antes. Se lee solo en este navegador: no se sube a ningún servidor.
-          <label className="file">
-            <input type="file" accept=".xlsx,.xls" onChange={onFile} />
-            {list ? `✔ ${list.name} · cargar otra versión` : 'Cargar Excel (.xlsx)'}
-          </label>
+          Usa el Excel de inscripciones del repositorio (<code>web/public/inscripciones.xlsx</code>) o carga uno desde tu equipo (export de Forms o checklist exportado).
+          {list && <p className="mono small">✔ {list.name}</p>}
+          <div className="chips">
+            <button className="btn" onClick={fromRepo}>Usar inscripciones del repositorio</button>
+            <label className="file ghost">
+              <input type="file" accept=".xlsx,.xls" onChange={onFile} />
+              Cargar Excel (.xlsx)
+            </label>
+          </div>
           {list && <p className="small">Si cargas una versión modificada, se conservan las marcas que ya hiciste.</p>}
           {msg && <p className="notice error" role="alert">{msg}</p>}
         </li>
@@ -337,7 +354,14 @@ function Organizer({ data }) {
                     <tr key={t.k} className={t.presente ? 'here' : ''}>
                       <td>
                         <Side t={t} />
-                        <div className="tags">{t.cats.map((c) => <span key={c} className="tag">{c}</span>)}</div>
+                        <fieldset className="cats">
+                          <legend className="small">Categorías{t.catsEditadas && ' (corregidas)'}</legend>
+                          {CATS.map((c) => (
+                            <label key={c} className={`tag ${t.cats.includes(c) ? '' : 'off'}`}>
+                              <input type="checkbox" checked={t.cats.includes(c)} onChange={() => toggleCat(t.k, c)} /> {c}
+                            </label>
+                          ))}
+                        </fieldset>
                         {t.integrantes.length > 0 && <p className="small members">{t.integrantes.join(' · ')}</p>}
                       </td>
                       <td>

@@ -33,7 +33,7 @@ const institution = (raw) => Object.entries(INST).find(([f]) => key(raw).include
 const yes = (v) => ['si', 'x', '✔', 'true', '1'].includes(key(v) || String(v).trim())
 
 // Acepta el export de Microsoft Forms (una fila por inscripción) o el checklist (una fila por equipo).
-// Devuelve un equipo por fila: { k, equipo, institucion, cats, integrantes, presente, revisado, obs }.
+// Devuelve un equipo por fila, en el orden del archivo: { k, equipo, institucion, cats, integrantes, presente, revisado, obs }.
 export function parseRows(rawRows) {
   const rows = rawRows.map((r) => Object.fromEntries(Object.entries(r).map(([h, v]) => [clean(h), v])))
   const forms = rows.length && 'Nombre del Equipo o Robot:' in rows[0]
@@ -63,13 +63,18 @@ export function parseRows(rawRows) {
       : String(r['Integrantes'] ?? '').split('\n')
     for (const m of names.map(clean)) if (m.length > 1 && !t.integrantes.some((x) => key(x) === key(m))) t.integrantes.push(m)
   }
-  return [...teams.values()].sort((a, b) => a.k.localeCompare(b.k))
+  return [...teams.values()]
 }
 
-// Al volver a cargar un archivo modificado se conservan las marcas ya hechas en la web.
+// Al volver a cargar un archivo modificado se conservan las marcas ya hechas en la web,
+// y la categoría si se corrigió a mano (catsEditadas).
 export const mergeStatus = (fresh, old = []) => {
   const prev = new Map(old.map((t) => [t.k, t]))
-  return fresh.map((t) => (prev.has(t.k) ? { ...t, presente: prev.get(t.k).presente, revisado: prev.get(t.k).revisado, obs: prev.get(t.k).obs } : t))
+  return fresh.map((t) => {
+    const o = prev.get(t.k)
+    if (!o) return t
+    return { ...t, presente: o.presente, revisado: o.revisado, obs: o.obs, ...(o.catsEditadas && { cats: o.cats, catsEditadas: true }) }
+  })
 }
 
 export const toSheetRows = (teams) =>

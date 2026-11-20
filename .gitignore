@@ -2,3 +2,6 @@ node_modules/
 dist/
 # Datos personales de inscripción: no subir a un repositorio público
 *.xlsx
+
+# Excepción: inscripciones sin datos personales (solo equipo, institución y categoría)
+!web/public/inscripciones.xlsx

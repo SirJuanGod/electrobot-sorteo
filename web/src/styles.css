@@ -158,3 +158,9 @@ footer a { color: #c9d6ff; }
 .checklist input[type='text'] { min-width: 10rem; width: 100%; box-sizing: border-box; }
 .members { margin: 6px 0 0; }
 .checklist td:first-child { min-width: 12rem; }
+.file.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.cats { border: 0; padding: 0; margin: 8px 0 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.cats legend { padding: 0; margin-bottom: 4px; }
+.cats .tag { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.cats .tag.off { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+.cats input { width: 0.9rem; height: 0.9rem; margin: 0; }

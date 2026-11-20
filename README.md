@@ -5,11 +5,11 @@ Web pública (React + Vite) con los enfrentamientos de **Sumo Colegios** y **Min
 ## Flujo del día
 
 1. **Entrar como organizador.** En la web abre `#organizador` (enlace "Organizador" en el pie) e ingresa la contraseña.
-2. **Checklist en la web.** Carga el Excel de inscripciones (el export de Forms, aunque lo hayas editado) o un checklist exportado antes. Marca *Presente*, *Revisado* y *Observaciones*. Las marcas se guardan en ese navegador; si cargas una versión nueva del Excel se conservan. Usa **Exportar checklist (.xlsx)** para tener copia.
+2. **Checklist en la web.** Pulsa **Usar inscripciones del repositorio** (lee `web/public/inscripciones.xlsx`) o carga un Excel desde tu equipo. Marca *Presente*, *Revisado* y *Observaciones*. Si un equipo se inscribió en la categoría equivocada, marca o desmarca sus categorías en la misma fila. Todo se guarda en ese navegador y se conserva si vuelves a cargar el Excel. Usa **Exportar checklist (.xlsx)** para tener copia.
 3. **Sortear.** Con "Sortear solo equipos presentes" pulsa **Sortear** y revisa la vista previa.
 4. **Publicar.** Pulsa **Descargar sorteo.json** y súbelo al repo en `web/public/sorteo.json` (GitHub › Add file › Upload files › Commit). GitHub Actions vuelve a publicar en 1–2 min.
 
-> El Excel **no se sube al repositorio**: es público y el export trae cédulas, celulares y correos. La web lo lee solo en tu navegador.
+> `web/public/inscripciones.xlsx` es público: solo tiene ID, equipo, institución y categoría, tal cual vienen de Forms. **Nunca subas el export completo**: trae cédulas, celulares y correos. Para editar inscripciones, modifica ese archivo en GitHub (descárgalo, edítalo y súbelo con el mismo nombre).
 
 ### Cambiar la contraseña del organizador
 

@@ -49,3 +49,17 @@ test('forms: une inscripciones del mismo equipo y limpia nombres', () => {
   assert.equal(merged[0].presente, true)
   assert.equal(merged[0].obs, 'ok')
 })
+
+test('checklist: respeta el orden del archivo y conserva categorías corregidas', () => {
+  const rows = [
+    { Equipo: 'ZETA', 'Institución': 'IE', 'Sumo Colegios': '✔' },
+    { Equipo: 'ALFA', 'Institución': 'IE', 'Minisumo PRO': '✔' },
+  ]
+  const t = parseRows(rows)
+  assert.deepEqual(t.map((x) => x.equipo), ['ZETA', 'ALFA'])
+  const fixed = [{ ...t[0], cats: ['Minisumo PRO'], catsEditadas: true }, t[1]]
+  const again = mergeStatus(parseRows(rows), fixed)
+  assert.deepEqual(again[0].cats, ['Minisumo PRO'])
+  assert.deepEqual(again[1].cats, ['Minisumo PRO'])
+  assert.equal(teamsFromChecklist(again, false)['Sumo Colegios'].equipos.length, 0)
+})
