@@ -53,7 +53,7 @@ body {
 .hero {
   color: #fff;
   background:
-    linear-gradient(100deg, rgba(8, 22, 75, 0.97) 35%, rgba(21, 70, 199, 0.55)),
+    linear-gradient(100deg, rgb(8, 22, 75) 45%, rgba(8, 22, 75, 0.85) 60%, rgba(21, 70, 199, 0.45)),
     url('/banner.jpg') center 72% / cover no-repeat; /* franja del robot, no el texto del banner */
   border-bottom: 4px solid var(--orange);
   padding: clamp(1.5rem, 5vw, 3.5rem) 16px;
