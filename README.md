@@ -4,18 +4,34 @@ Web pública (React + Vite) con los enfrentamientos de **Sumo Colegios** y **Min
 
 ## Flujo del día
 
-1. **Checklist (OneDrive).** Sube `Checklist_Electrobot.xlsx` a OneDrive. Un equipo por fila; si está en varias categorías aparece una sola vez con varias ✔. Filtra por categoría con el filtro de la columna (`Sumo Colegios`, `Minisumo PRO`, `Robot Laberinto`) y marca `Presente` / `Robot revisado` con la lista Sí/No.
-2. **Sortear.** En la web abre `#organizador` (enlace "Organizador" en el pie). Descarga el checklist de OneDrive y cárgalo; con "Solo Presente = Sí" sortea solo a los que llegaron. Pulsa **Sortear** y revisa la vista previa.
-3. **Publicar.** Pulsa **Descargar sorteo.json** y súbelo al repo en `web/public/sorteo.json` (GitHub › Add file › Upload files › Commit). GitHub Actions vuelve a publicar en 1–2 min.
+1. **Entrar como organizador.** En la web abre `#organizador` (enlace "Organizador" en el pie) e ingresa la contraseña.
+2. **Checklist.** Pulsa **Usar inscripciones del repositorio** (lee `web/public/inscripciones.xlsx`) o carga un Excel desde tu equipo. Marca *Presente*, *Revisado* y *Observaciones*. Si un equipo se inscribió en la categoría equivocada, corrígela en su fila. Todo se guarda en ese navegador. **Exportar checklist (.xlsx)** te da una copia.
+3. **Sortear.** Con "Sortear solo equipos presentes" pulsa **Sortear**, revisa la vista previa y pulsa **Publicar sorteo**. El público ve sus combates al instante.
+4. **Ganadores.** En el mismo panel toca al ganador de cada combate (tócalo otra vez para deshacer). La siguiente ronda se arma sola hasta la final; los BYE avanzan solos. El público lo ve en vivo sin recargar.
 
-## Regenerar el checklist desde un nuevo export de Forms
+Laberinto solo tiene orden de salida.
 
-```bash
-pip install openpyxl
-python tools/checklist.py "ruta/al/export.xlsx"
-```
+## Inscripciones (`web/public/inscripciones.xlsx`)
 
-Esto reescribe `Checklist_Electrobot.xlsx` y `web/public/sorteo.json` (solo nombre de equipo e institución, sin datos personales).
+Para cambiar equipos, edita ese Excel en GitHub (descárgalo, modifícalo y súbelo con el mismo nombre). Al hacer commit en `main`, GitHub Actions vuelve a generar la lista pública de equipos y publica en 1–2 minutos. No hay que correr ningún script.
+
+> El archivo es público: solo tiene ID, equipo, institución y categoría. **Nunca subas el export completo de Forms**: trae cédulas, celulares y correos.
+
+## Configurar Firebase (una sola vez, gratis)
+
+Sin esto la web funciona, pero no hay sorteo ni ganadores en vivo (se usa `sorteo.json` y la contraseña local).
+
+1. En [console.firebase.google.com](https://console.firebase.google.com) crea un proyecto (puedes desactivar Analytics).
+2. **Compilación › Realtime Database › Crear base de datos** (ubicación cualquiera, modo bloqueado). En la pestaña **Reglas** pega el contenido de `database.rules.json` y publica.
+3. **Compilación › Authentication › Comenzar › Correo electrónico/contraseña: habilitar**. En **Usuarios › Agregar usuario** crea `organizador@electrobot-usc.com` con la contraseña que usarán los organizadores. No hace falta que el correo exista.
+4. **Configuración del proyecto › Tus apps › Web (`</>`)**: registra la app y copia el objeto `firebaseConfig`.
+5. En GitHub edita `web/src/firebase.js` y reemplaza `const CONFIG = null` por `const CONFIG = { ...lo que copiaste... }`. Haz commit en `main`.
+
+La configuración no es secreta. Lo que protege los datos son las reglas: todos pueden leer, y solo la cuenta del organizador puede escribir. Si cambias el correo del organizador, cámbialo también en `database.rules.json` (y en Firebase) y en `ORG_EMAIL` de `web/src/firebase.js`.
+
+### Sin Firebase: contraseña local
+
+La contraseña local se verifica en el navegador; solo impide el acceso casual. Para cambiarla: `cd web && npm run clave -- "NuevaClave"` y copia el hash en `ORG_HASH` de `web/src/App.jsx`.
 
 ## Desarrollo
 

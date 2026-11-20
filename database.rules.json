@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "torneo": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email === 'organizador@electrobot-usc.com'"
+    }
+  }
+}

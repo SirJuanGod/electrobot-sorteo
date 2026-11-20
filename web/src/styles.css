@@ -117,20 +117,21 @@ h2 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 900; }
 
 .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 .filters label { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; font-weight: 700; color: var(--muted); flex: 1 1 200px; }
-select, input[type='search'] {
+select, input[type='search'], input[type='password'], input[type='text'] {
   font: inherit; font-size: 1rem; color: var(--ink); background: var(--card);
   border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.75rem;
 }
 select:focus, input:focus, .btn:focus-visible, .tabs a:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
 
 .steps { padding-left: 1.2rem; display: grid; gap: 20px; }
-.steps li { padding-left: 4px; }
+.steps li { padding-left: 4px; min-width: 0; }
 .steps li > * { margin-top: 10px; }
 .file, .btn {
   display: inline-block; cursor: pointer; font: inherit; font-weight: 700;
   padding: 0.7rem 1.2rem; border-radius: 10px; border: 0;
   background: var(--blue); color: #fff;
 }
+.file { max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; }
 .file input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .file:focus-within { outline: 3px solid var(--cyan); outline-offset: 2px; }
 .btn.alt { background: var(--orange); color: #1a0d00; display: block; }
@@ -145,3 +146,32 @@ footer {
   padding: 16px; background: var(--navy); color: #c9d6ff; font-size: 0.85rem;
 }
 footer a { color: #c9d6ff; }
+
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.checklist { width: 100%; border-collapse: collapse; }
+.checklist th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.checklist td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.checklist td:nth-child(2), .checklist td:nth-child(3), .checklist th:nth-child(2), .checklist th:nth-child(3) { text-align: center; }
+.checklist tr.here td:first-child { box-shadow: inset 4px 0 0 var(--ok); }
+.checklist input[type='checkbox'] { width: 1.4rem; height: 1.4rem; cursor: pointer; }
+.checklist input[type='text'] { min-width: 10rem; width: 100%; box-sizing: border-box; }
+.members { margin: 6px 0 0; }
+.checklist td:first-child { min-width: 12rem; }
+.file.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.cats { border: 0; padding: 0; margin: 8px 0 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.cats legend { padding: 0; margin-bottom: 4px; }
+.cats .tag { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.cats .tag.off { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+.cats input { width: 0.9rem; height: 0.9rem; margin: 0; }
+.round + .round { margin-top: 24px; }
+.round h3 { margin: 0 0 8px; }
+.match.done { border-top-color: var(--ok); }
+.won { color: var(--ok); font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.pick { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.pick:hover { border-color: var(--blue); }
+.pick:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.pick.win { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.champion { margin: 0 0 20px; padding: 14px 18px; border-radius: 12px; background: var(--orange); color: #1a0d00; font-size: 1.1rem; }
+.champion span { display: block; font-size: 0.85rem; }
+.results > section + section { margin-top: 32px; }
