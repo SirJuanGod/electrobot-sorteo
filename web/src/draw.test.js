@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { drawCategory, teamsFromChecklist, bracket } from './draw.js'
+import { drawCategory, teamsFromChecklist, bracket, parseTime, fmtTime, ranking } from './draw.js'
 import { parseRows, mergeStatus, toSheetRows } from './checklist.js'
 
 const teams = ['A', 'B', 'C', 'D', 'E'].map((equipo) => ({ equipo, institucion: 'X' }))
@@ -80,4 +80,24 @@ test('llaves: eliminación directa con BYE y campeón', () => {
   assert.equal(r[1][0].w, undefined)
   assert.deepEqual(bracket([]), [])
   assert.equal(bracket([[T('A'), null]])[0][0].w.equipo, 'A')
+})
+
+test('laberinto: tiempos y ganador', () => {
+  assert.equal(parseTime('1:23.45'), 83.45)
+  assert.equal(parseTime('83,45'), 83.45)
+  assert.equal(parseTime(' nt '), 'NT')
+  assert.equal(parseTime(''), null)
+  assert.ok(Number.isNaN(parseTime('1:75')))
+  assert.ok(Number.isNaN(parseTime('abc')))
+  assert.equal(fmtTime(83.45), '1:23.45')
+  assert.equal(fmtTime(5), '0:05.00')
+  const T = (equipo) => ({ equipo, institucion: 'X' })
+  const order = [T('A'), T('B'), T('C')]
+  let r = ranking(order, { 0: 'NT', 2: 40.5 })
+  assert.deepEqual(r.rows.map((x) => x.t.equipo), ['C', 'A'])
+  assert.equal(r.winner, null) // falta B
+  r = ranking(order, { 0: 'NT', 1: 50, 2: 40.5 })
+  assert.deepEqual(r.rows.map((x) => x.t.equipo), ['C', 'B', 'A'])
+  assert.equal(r.winner.equipo, 'C')
+  assert.equal(ranking(order, { 0: 'NT', 1: 'NT', 2: 'NT' }).winner, null)
 })

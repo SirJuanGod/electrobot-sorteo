@@ -9,7 +9,7 @@ Web pública (React + Vite) con los enfrentamientos de **Sumo Colegios** y **Min
 3. **Sortear.** Con "Sortear solo equipos presentes" pulsa **Sortear**, revisa la vista previa y pulsa **Publicar sorteo**. El público ve sus combates al instante.
 4. **Ganadores.** En el mismo panel toca al ganador de cada combate (tócalo otra vez para deshacer). La siguiente ronda se arma sola hasta la final; los BYE avanzan solos. El público lo ve en vivo sin recargar.
 
-Laberinto solo tiene orden de salida.
+5. **Laberinto.** En el mismo panel escribe el tiempo de cada equipo (`1:23.45`, `83.45` o `83,45`) o `NT` si no terminó, y pulsa Enter. Bórralo para quitarlo. El público ve la clasificación en vivo; el ganador aparece cuando todos los equipos tienen tiempo o NT. Se guarda un tiempo por equipo: escribe el mejor.
 
 ## Inscripciones (`web/public/inscripciones.xlsx`)
 
