@@ -1,7 +1,13 @@
 // Pega aquí la configuración de tu app web de Firebase (Consola › Configuración del proyecto › Tus apps).
 // No es secreta: lo que protege los datos son las reglas de la base de datos (ver README).
-// Mientras sea null, la web funciona sin resultados en vivo (sorteo.json + contraseña local).
-const CONFIG = null
+// Con null, la web funciona sin resultados en vivo (sorteo.json + contraseña local).
+const CONFIG = {
+  apiKey: 'AIzaSyAYDg-L6yJuFbs4h_IMZSSOvMk8A1KsHUk',
+  authDomain: 'electrobot-usc.firebaseapp.com',
+  databaseURL: 'https://electrobot-usc-default-rtdb.firebaseio.com',
+  projectId: 'electrobot-usc',
+  appId: '1:407342438951:web:fee4a16a682ae540804c02',
+}
 
 // Cuenta del organizador creada en Firebase Authentication (correo/contraseña). En la web solo se pide la contraseña.
 export const ORG_EMAIL = 'organizador@electrobot-usc.com'
